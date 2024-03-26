@@ -26,6 +26,8 @@ jobs:
         with:
           script: |
             return context.repo.repo
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Prepare
         id: prep
         run: |

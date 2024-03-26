@@ -28,7 +28,14 @@ if [ -z "${SHARED_DIRECTORY}" ]; then
   exit 1
 else
   echo "Writing SHARED_DIRECTORY to /etc/exports file"
-  echo "{{SHARED_DIRECTORY}} {{PERMITTED}}({{READ_ONLY}},fsid=0,{{SYNC}},no_subtree_check,no_auth_nlm,insecure,no_root_squash)" >> /etc/exports
+  # Split PERMITTED on commas and iterate
+  IFS=',' read -ra ADDR <<< "$PERMITTED"
+  base_text="{{SHARED_DIRECTORY}}"
+
+  for ip in "${ADDR[@]}"; do
+	  base_text+=" $ip({{READ_ONLY}},fsid=0,{{SYNC}},no_subtree_check,no_auth_nlm,insecure,no_root_squash)" 
+  done
+  echo "$base_text" >> /etc/exports
   /bin/sed -i "s@{{SHARED_DIRECTORY}}@${SHARED_DIRECTORY}@g" /etc/exports
 fi
 
